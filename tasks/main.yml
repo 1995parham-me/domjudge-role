@@ -47,17 +47,12 @@
     check_implicit_admin: true
     state: present
 
-- name: checking the root credentials
-  mysql_user:
-    name: root
-    password: "{{ mysql_root_password }}"
+- name: get mysql databases
+  community.mysql.mysql_info:
     login_user: root
-    login_host: "localhost"
     login_password: "{{ mysql_root_password }}"
-    host: localhost
-    priv: '*.*:ALL,GRANT'
-    check_implicit_admin: true
-    state: present
+    filter: databases
+  register: mysql_info
 
 - name: create domjudge user
   ansible.builtin.user:
@@ -108,13 +103,13 @@
 - name: generate database password
   become: true
   command: bin/dj_setup_database genpass
-  when: domserver == "enabled"
+  when: domserver == "enabled" and domjudge not in mysql_info.databases
   args:
     chdir: /home/domjudge/domjudge/domserver
 
 - name: setup database
   become: true
   command: bin/dj_setup_database -u root -p {{ mysql_root_password }} install
-  when: domserver == "enabled"
+  when: domserver == "enabled" and domjudge not in mysql_info.databases
   args:
     chdir: /home/domjudge/domjudge/domserver
