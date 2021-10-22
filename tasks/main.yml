@@ -9,7 +9,7 @@
       - unzip
       - mariadb-server
       - python3-mysqldb
-      - nginx
+      - apache
       - php
       - php-fpm
       - php-gd
