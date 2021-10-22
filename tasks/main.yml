@@ -28,6 +28,13 @@
       - libjsoncpp-dev
       - libmagic-dev
 
+
+- name: starting and enabling the mariadb service
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+
 - name: setting up root credentials
   ignore_errors: true
   mysql_user:
