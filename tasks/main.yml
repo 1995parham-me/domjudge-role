@@ -38,7 +38,7 @@
   ignore_errors: true
   mysql_user:
     name: root
-    password: {{mysql_root_password}}
+    password: "{{mysql_root_password}}"
     login_user: root
     login_host: "localhost"
     host: localhost
@@ -49,10 +49,10 @@
 - name: checking the root credentials
   mysql_user:
     name: root
-    password: {{mysql_root_password}}
+    password: "{{mysql_root_password}}"
     login_user: root
     login_host: "localhost"
-    login_password: {{mysql_root_password}}
+    login_password: "{{mysql_root_password}}"
     host: localhost
     priv: '*.*:ALL,GRANT'
     check_implicit_admin: true
