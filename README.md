@@ -11,4 +11,5 @@
 ```yaml
 mysql_root_password: ceit_is_the_best
 version: 7.3.3
+domserver: enabled
 ```

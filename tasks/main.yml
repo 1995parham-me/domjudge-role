@@ -92,11 +92,13 @@
   become: true
   become_user: domjudge
   command: make domserver
+  when: domserver == "enabled"
   args:
     chdir: /home/domjudge/src/domjudge-{{version}}
 
 - name: install
   become: true
   command: make install-domserver
+  when: domserver == "enabled"
   args:
     chdir: /home/domjudge/src/domjudge-{{version}}
