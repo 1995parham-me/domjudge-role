@@ -38,7 +38,7 @@
   ignore_errors: true
   mysql_user:
     name: root
-    password: "{{mysql_root_password}}"
+    password: "{{ mysql_root_password }}"
     login_user: root
     login_host: "localhost"
     host: localhost
@@ -49,10 +49,10 @@
 - name: checking the root credentials
   mysql_user:
     name: root
-    password: "{{mysql_root_password}}"
+    password: "{{ mysql_root_password }}"
     login_user: root
     login_host: "localhost"
-    login_password: "{{mysql_root_password}}"
+    login_password: "{{ mysql_root_password }}"
     host: localhost
     priv: '*.*:ALL,GRANT'
     check_implicit_admin: true
@@ -69,23 +69,24 @@
   become_user: domjudge
   file:
     path: /home/domjudge/src
+    mode: 0755
     state: directory
 
 - name: download
   become: true
   become_user: domjudge
   ansible.builtin.unarchive:
-    src: https://www.domjudge.org/releases/domjudge-{{version}}.tar.gz
+    src: https://www.domjudge.org/releases/domjudge-{{ version }}.tar.gz
     dest: /home/domjudge/src
     remote_src: true
-    creates: /home/domjudge/src/domjudge-{{version}}
+    creates: /home/domjudge/src/domjudge-{{ version }}
 
 - name: configure
   become: true
   become_user: domjudge
   command: ./configure --prefix=$HOME/domjudge
   args:
-    chdir: /home/domjudge/src/domjudge-{{version}}
+    chdir: /home/domjudge/src/domjudge-{{ version }}
     creates: paths.mk
 
 - name: make
@@ -94,11 +95,11 @@
   command: make domserver
   when: domserver == "enabled"
   args:
-    chdir: /home/domjudge/src/domjudge-{{version}}
+    chdir: /home/domjudge/src/domjudge-{{ version }}
 
 - name: install
   become: true
   command: make install-domserver
   when: domserver == "enabled"
   args:
-    chdir: /home/domjudge/src/domjudge-{{version}}
+    chdir: /home/domjudge/src/domjudge-{{ version }}
