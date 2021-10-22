@@ -1,0 +1,102 @@
+---
+- name: install requirements
+  become: true
+  apt:
+    name:
+      - build-essential
+      - acl
+      - zip
+      - unzip
+      - mariadb-server
+      - python3-mysqldb
+      - nginx
+      - php
+      - php-fpm
+      - php-gd
+      - php-cli
+      - php-intl
+      - php-mbstring
+      - php-mysql
+      - php-curl
+      - php-json
+      - php-xml
+      - php-zip
+      - composer
+      - ntp
+      - libcgroup-dev
+      - libcurl4-gnutls-dev
+      - libjsoncpp-dev
+      - libmagic-dev
+
+- name: starting and enabling the mariadb service
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: setting up root credentials
+  ignore_errors: true
+  mysql_user:
+    name: root
+    password: {{mysql_root_password}}
+    login_user: root
+    login_host: "localhost"
+    host: localhost
+    priv: '*.*:ALL,GRANT'
+    check_implicit_admin: true
+    state: present
+
+- name: checking the root credentials
+  mysql_user:
+    name: root
+    password: {{mysql_root_password}}
+    login_user: root
+    login_host: "localhost"
+    login_password: {{mysql_root_password}}
+    host: localhost
+    priv: '*.*:ALL,GRANT'
+    check_implicit_admin: true
+    state: present
+
+- name: create domjudge user
+  ansible.builtin.user:
+    name: domjudge
+    create_home: true
+    state: present
+
+- name: create Downloads directory
+  become: true
+  become_user: domjudge
+  file:
+    path: /home/domjudge/src
+    state: directory
+
+- name: download
+  become: true
+  become_user: domjudge
+  ansible.builtin.unarchive:
+    src: https://www.domjudge.org/releases/domjudge-{{version}}.tar.gz
+    dest: /home/domjudge/src
+    remote_src: true
+    creates: /home/domjudge/src/domjudge-{{version}}
+
+- name: configure
+  become: true
+  become_user: domjudge
+  command: ./configure --prefix=$HOME/domjudge
+  args:
+    chdir: /home/domjudge/src/domjudge-{{version}}
+    creates: paths.mk
+
+- name: make
+  become: true
+  become_user: domjudge
+  command: make domserver
+  args:
+    chdir: /home/domjudge/src/domjudge-{{version}}
+
+- name: install
+  become: true
+  command: make install-domserver
+  args:
+    chdir: /home/domjudge/src/domjudge-{{version}}

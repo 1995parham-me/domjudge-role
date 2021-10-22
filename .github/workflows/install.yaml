@@ -1,0 +1,25 @@
+---
+name: install
+on:
+  push:
+    branches:
+      - main
+jobs:
+  ubuntu-install:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: install ansible
+        run: pip3 install ansible
+      - name: install ansible lint
+        run: pip3 install ansible-lint
+      - name: ansible version
+        run: ansible --version
+      - name: create ansible.cfg with correct roles_path
+        run: printf '[defaults]\nroles_path=../' > ansible.cfg
+      - name: ansible lint
+        run: ansible-lint .
+      - name: basic role syntax check
+        run: ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+      - name: install domjudge
+        run: ansible-playbook tests/test.yml -i tests/inventory --become
