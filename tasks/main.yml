@@ -116,6 +116,7 @@
 
 - name: apache configuration softlink
   become: true
+  when: domserver == "enabled"
   file:
     src: /home/domjudge/domjudge/domserver/etc/apache.conf
     dest: /etc/apache2/conf-available/domjudge.conf
@@ -123,6 +124,7 @@
 
 - name: phpfpm configuration softlink
   become: true
+  when: domserver == "enabled"
   file:
     src: /home/domjudge/domjudge/domserver/etc/domjudge-fpm.conf
     dest: /etc/php/7.3/fpm/pool.d/domjudge.conf
@@ -130,18 +132,22 @@
 
 - name: enable apache modes
   become: true
+  when: domserver == "enabled"
   command: a2enmod proxy_fcgi setenvif rewrite
 
 - name: enable apache configs
   become: true
+  when: domserver == "enabled"
   command: a2enconf php7.3-fpm domjudge
 
 - name: reload php-fpm
+  when: domserver == "enabled"
   service:
     name: php7.3-fpm
     state: reloaded
 
 - name: reload apache
+  when: domserver == "enabled"
   service:
     name: apache2
     state: reloaded
