@@ -103,13 +103,13 @@
 - name: generate database password
   become: true
   command: bin/dj_setup_database genpass
-  when: domserver == "enabled" and domjudge not in mysql_info.databases
+  when: domserver == "enabled" and "domjudge" not in mysql_info.databases
   args:
     chdir: /home/domjudge/domjudge/domserver
 
 - name: setup database
   become: true
   command: bin/dj_setup_database -u root -p {{ mysql_root_password }} install
-  when: domserver == "enabled" and domjudge not in mysql_info.databases
+  when: domserver == "enabled" and "domjudge" not in mysql_info.databases
   args:
     chdir: /home/domjudge/domjudge/domserver
