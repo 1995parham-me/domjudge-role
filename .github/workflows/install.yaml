@@ -21,5 +21,3 @@ jobs:
         run: ansible-lint .
       - name: basic role syntax check
         run: ansible-playbook tests/test.yml -i tests/inventory --syntax-check
-      - name: install domjudge
-        run: ansible-playbook tests/test.yml -i tests/inventory --become
