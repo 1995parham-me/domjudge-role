@@ -28,7 +28,6 @@
       - libjsoncpp-dev
       - libmagic-dev
 
-
 - name: starting and enabling the mariadb service
   service:
     name: mariadb
@@ -127,7 +126,7 @@
   when: domserver == "enabled"
   file:
     src: /home/domjudge/domjudge/domserver/etc/domjudge-fpm.conf
-    dest: /etc/php/7.3/fpm/pool.d/domjudge.conf
+    dest: /etc/php/{{ php_version }}/fpm/pool.d/domjudge.conf
     state: link
 
 - name: enable apache modes
@@ -138,12 +137,12 @@
 - name: enable apache configs
   become: true
   when: domserver == "enabled"
-  command: a2enconf php7.3-fpm domjudge
+  command: a2enconf php{{ php_version }}-fpm domjudge
 
 - name: reload php-fpm
   when: domserver == "enabled"
   service:
-    name: php7.3-fpm
+    name: php{{ php_verion }}-fpm
     state: reloaded
 
 - name: reload apache
