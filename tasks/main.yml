@@ -142,7 +142,7 @@
 - name: reload php-fpm
   when: domserver == "enabled"
   service:
-    name: php{{ php_verion }}-fpm
+    name: php{{ php_version }}-fpm
     state: reloaded
 
 - name: reload apache
