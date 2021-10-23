@@ -185,3 +185,20 @@
     src: templates/create-cgroups.service
     dest: /etc/systemd/system/create-cgroups.service
     mode: 0644
+
+- name: start and enable cgroup service
+  become: true
+  when: judgehost == "enabled"
+  service:
+    name: create-cgroups
+    state: started
+    enabled: true
+
+- name: start and enable judgehost service
+  become: true
+  when: judgehost == "enabled"
+  loop: "{{ range(0, judgehosts) | list }}"
+  service:
+    name: domjudge-judgehost@{{ item }}
+    state: started
+    enabled: true
