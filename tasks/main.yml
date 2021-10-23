@@ -139,14 +139,14 @@
   when: domserver == "enabled"
   command: a2enconf php{{ php_version }}-fpm domjudge
 
-- name: reload php-fpm
-  when: domserver == "enabled"
-  service:
-    name: php{{ php_version }}-fpm
-    state: reloaded
-
 - name: reload apache
   when: domserver == "enabled"
   service:
     name: apache2
+    state: reloaded
+
+- name: reload php-fpm
+  when: domserver == "enabled"
+  service:
+    name: php{{ php_version }}-fpm
     state: reloaded
