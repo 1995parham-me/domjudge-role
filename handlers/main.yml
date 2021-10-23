@@ -1,10 +1,12 @@
 ---
-- name: restart apache
+- name: reload apache
+  become: true
   service:
     name: apache2
-    state: restarted
+    state: reloaded
 
-- name: restart php-fpm
+- name: reload php-fpm
+  become: true
   service:
     name: php{{ php_version }}-fpm
-    state: restarted
+    state: reloaded

@@ -139,5 +139,5 @@
   when: domserver == "enabled"
   command: a2enconf php{{ php_version }}-fpm domjudge
   notify:
-    - restart apache
-    - restart php-fpm
+    - reload apache
+    - reload php-fpm
