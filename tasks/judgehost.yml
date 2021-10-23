@@ -5,6 +5,7 @@
   command: make judgehost
   args:
     chdir: /home/domjudge/src/domjudge-{{ version }}
+    creates: /home/domjudge/domjudge/judgehost/etc
 
 - name: install
   become: true
@@ -12,6 +13,7 @@
   when: judgehost == "enabled"
   args:
     chdir: /home/domjudge/src/domjudge-{{ version }}
+    creates: /home/domjudge/domjudge/judgehost/lib
 
 - name: create judgehost user
   become: true

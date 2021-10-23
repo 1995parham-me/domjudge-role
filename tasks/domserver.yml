@@ -13,12 +13,14 @@
   command: make domserver
   args:
     chdir: /home/domjudge/src/domjudge-{{ version }}
+    creates: /home/domjudge/domjudge/judgehost/etc
 
 - name: install
   become: true
   command: make install-domserver
   args:
     chdir: /home/domjudge/src/domjudge-{{ version }}
+    creates: /home/domjudge/domjudge/judgehost/lib
 
 - name: generate database password
   become: true
