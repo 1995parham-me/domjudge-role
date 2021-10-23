@@ -122,8 +122,16 @@
   when: domserver == "enabled"
   template:
     src: templates/domjudge.conf
-    dest: /etc/nginx/sites-enabled/domjudge
+    dest: /etc/nginx/sites-available/domjudge
     mode: 0755
+
+- name: enable nginx domjudge
+  become: true
+  when: domserver == "enabled"
+  template:
+    src: /etc/nginx/sites-available/domjudge
+    dest: /etc/nginx/sites-enabled/default
+    state: link
   notify:
     - reload nginx
 
