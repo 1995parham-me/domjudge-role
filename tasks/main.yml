@@ -122,7 +122,8 @@
   when: domserver == "enabled"
   template:
     src: templates/domjudge.conf
-    dest: /etc/nginx/site-enabled/domjudge
+    dest: /etc/nginx/sites-enabled/domjudge
+    mode: 0755
   notify:
     - reload nginx
 
