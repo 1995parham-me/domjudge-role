@@ -1,8 +1,8 @@
 ---
-- name: reload apache
+- name: reload nginx
   become: true
   service:
-    name: apache2
+    name: nginx
     state: reloaded
 
 - name: reload php-fpm
