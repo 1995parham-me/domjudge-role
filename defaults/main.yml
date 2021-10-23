@@ -2,4 +2,6 @@
 mysql_root_password: ceit_is_the_best
 version: 7.3.3
 domserver: enabled
+judgehost: disabled
+judgehosts: 2
 php_version: 7.4
