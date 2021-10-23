@@ -202,3 +202,11 @@
     name: domjudge-judgehost@{{ item }}
     state: started
     enabled: true
+
+- name: judgehost restapi secret configuration
+  become: true
+  when: judgehost == "enabled"
+  template:
+    src: templates/restapi.secret
+    dest: /home/domjudge/domjudge/judgehost/etc/restapi.secret
+    mode: 0600

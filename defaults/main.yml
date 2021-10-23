@@ -1,7 +1,11 @@
 ---
 mysql_root_password: ceit_is_the_best
 version: 7.3.3
+php_version: 7.4
 domserver: enabled
 judgehost: disabled
 judgehosts: 2
-php_version: 7.4
+
+judgehost_domserver_url: http://localhost/domjudge/api
+judgehost_domserver_user: judgehost
+judgehost_domserver_pass: NP3FziLos2cHN0LN
