@@ -86,6 +86,13 @@
   become: true
   reboot: {}
 
+- name: make chroot
+  become: true
+  command: dj_make_chroot
+  args:
+    chdir: /home/domjudge/domjudge/judgehost/bin
+    creates: /chroot/domjudge
+
 - name: start and enable cgroup service
   become: true
   service:
