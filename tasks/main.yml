@@ -193,7 +193,7 @@
     state: present
     dest: /etc/default/grub
     backrefs: true
-    regexp: '^(GRUB_CMDLINE_LINUX=(?!.* cgroup_enable)\"[^\"]+)(\".*)'
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* cgroup_enable)\"[^\"]+)(\".*)'
     line: '\1 cgroup_enable=memory\2'
 
 - name: enable cgroup memory
@@ -203,7 +203,7 @@
     state: present
     dest: /etc/default/grub
     backrefs: true
-    regexp: '^(GRUB_CMDLINE_LINUX=(?!.* swapaccount)\"[^\"]+)(\".*)'
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* swapaccount)\"[^\"]+)(\".*)'
     line: '\1 swapaccount=1\2'
 
 - name: start and enable cgroup service
