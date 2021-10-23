@@ -88,9 +88,9 @@
 
 - name: make chroot
   become: true
-  command: dj_make_chroot
+  command: bin/dj_make_chroot
   args:
-    chdir: /home/domjudge/domjudge/judgehost/bin
+    chdir: /home/domjudge/domjudge/judgehost
     creates: /chroot/domjudge
 
 - name: start and enable cgroup service
