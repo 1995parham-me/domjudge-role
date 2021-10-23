@@ -128,7 +128,7 @@
 - name: enable nginx domjudge
   become: true
   when: domserver == "enabled"
-  template:
+  file:
     src: /etc/nginx/sites-available/domjudge
     dest: /etc/nginx/sites-enabled/default
     state: link
