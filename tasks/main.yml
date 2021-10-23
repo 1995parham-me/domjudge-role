@@ -9,7 +9,7 @@
       - unzip
       - mariadb-server
       - python3-mysqldb
-      - apache2
+      - nginx
       - php
       - php-fpm
       - php-gd
@@ -117,13 +117,15 @@
   args:
     chdir: /home/domjudge/domjudge/domserver
 
-- name: apache configuration softlink
+- name: nginx configuration
   become: true
   when: domserver == "enabled"
-  file:
-    src: /home/domjudge/domjudge/domserver/etc/apache.conf
-    dest: /etc/apache2/conf-available/domjudge.conf
+  template:
+    src: templates/domjudge.conf
+    dest: /etc/nginx/site-enabled/domjudge
     state: link
+  notify:
+    - reload nginx
 
 - name: phpfpm configuration softlink
   become: true
@@ -132,16 +134,5 @@
     src: /home/domjudge/domjudge/domserver/etc/domjudge-fpm.conf
     dest: /etc/php/{{ php_version }}/fpm/pool.d/domjudge.conf
     state: link
-
-- name: enable apache modes
-  become: true
-  when: domserver == "enabled"
-  command: a2enmod proxy_fcgi setenvif rewrite
-
-- name: enable apache configs
-  become: true
-  when: domserver == "enabled"
-  command: a2enconf php{{ php_version }}-fpm domjudge
   notify:
-    - reload apache
     - reload php-fpm
