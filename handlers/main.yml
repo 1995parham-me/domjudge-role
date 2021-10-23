@@ -14,7 +14,3 @@
 - name: update grub
   become: true
   command: update-grub
-
-- name: reboot
-  become: true
-  reboot: {}

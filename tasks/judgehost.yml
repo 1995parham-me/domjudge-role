@@ -10,7 +10,6 @@
 - name: install
   become: true
   command: make install-judgehost
-  when: judgehost == "enabled"
   args:
     chdir: /home/domjudge/src/domjudge-{{ version }}
     creates: /home/domjudge/domjudge/judgehost/lib
@@ -18,7 +17,6 @@
 - name: create judgehost user
   become: true
   loop: "{{ range(0, judgehosts) | list }}"
-  when: judgehost == "enabled"
   ansible.builtin.user:
     name: domjudge-run-{{ item }}
     create_home: false
@@ -27,7 +25,6 @@
 
 - name: domjudge judgehost service
   become: true
-  when: judgehost == "enabled"
   template:
     src: templates/domjudge-judgehost@.service
     dest: /etc/systemd/system/domjudge-judgehost@.service
@@ -35,35 +32,62 @@
 
 - name: domjudge cgroup service
   become: true
-  when: judgehost == "enabled"
   template:
     src: templates/create-cgroups.service
     dest: /etc/systemd/system/create-cgroups.service
     mode: 0644
 
-- name: enable cgroup memory
+- name: check cgroup memory in grub
   become: true
-  when: judgehost == "enabled"
   lineinfile:
-    state: present
-    dest: /etc/default/grub
-    backrefs: true
-    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* cgroup_enable)\"[^\"]+)(\".*)'
-    line: '\1 cgroup_enable=memory\2'
+    backup: true
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT=".*cgroup_enable'
+    state: absent
+  check_mode: true
+  register: cgroup_enable_grub_check
+  changed_when: false
 
-- name: enable cgroup memory
+- name: enable cgroup memory in grub
   become: true
-  when: judgehost == "enabled"
+  when: cgroup_enable_grub_check.found == 0
+  notify: update grub
   lineinfile:
     state: present
     dest: /etc/default/grub
     backrefs: true
-    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* swapaccount)\"[^\"]+)(\".*)'
-    line: '\1 swapaccount=1\2'
+    regexp: "^(GRUB_CMDLINE_LINUX_DEFAULT=\".*)\"$"
+    line: '\1 cgroup_enable=memory"'
+
+- name: check swapaccount in grub
+  become: true
+  lineinfile:
+    backup: true
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT=".*swapaccount'
+    state: absent
+  check_mode: true
+  register: swapaccount_grub_check
+  changed_when: false
+
+- name: enable swapaccount in grub
+  become: true
+  when: swapaccount_grub_check.found == 0
+  notify: update grub
+  lineinfile:
+    state: present
+    dest: /etc/default/grub
+    backrefs: true
+    regexp: "^(GRUB_CMDLINE_LINUX_DEFAULT=\".*)\"$"
+    line: '\1 swapaccount=1"'
+
+- name: restart after update-grub
+  when: swapaccount_grub_check.found == 0 or cgroup_enable_grub_check == 0
+  become: true
+  reboot: {}
 
 - name: start and enable cgroup service
   become: true
-  when: judgehost == "enabled"
   service:
     name: create-cgroups
     state: started
@@ -71,7 +95,6 @@
 
 - name: start and enable judgehost service
   become: true
-  when: judgehost == "enabled"
   loop: "{{ range(0, judgehosts) | list }}"
   service:
     name: domjudge-judgehost@{{ item }}
@@ -80,7 +103,6 @@
 
 - name: judgehost restapi secret configuration
   become: true
-  when: judgehost == "enabled"
   template:
     src: templates/restapi.secret
     dest: /home/domjudge/domjudge/judgehost/etc/restapi.secret
