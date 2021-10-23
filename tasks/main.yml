@@ -29,6 +29,7 @@
       - libmagic-dev
 
 - name: starting and enabling the mariadb service
+  become: true
   service:
     name: mariadb
     state: started
@@ -36,6 +37,7 @@
 
 - name: setting up root credentials
   ignore_errors: true
+  become: true
   mysql_user:
     name: root
     password: "{{ mysql_root_password }}"
@@ -47,6 +49,7 @@
     state: present
 
 - name: get mysql databases
+  become: true
   community.mysql.mysql_info:
     login_user: root
     login_password: "{{ mysql_root_password }}"
@@ -54,12 +57,13 @@
   register: mysql_info
 
 - name: create domjudge user
+  become: true
   ansible.builtin.user:
     name: domjudge
     create_home: true
     state: present
 
-- name: create Downloads directory
+- name: create src directory
   become: true
   become_user: domjudge
   file:
