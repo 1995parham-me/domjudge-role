@@ -186,6 +186,26 @@
     dest: /etc/systemd/system/create-cgroups.service
     mode: 0644
 
+- name: enable cgroup memory
+  become: true
+  when: judgehost == "enabled"
+  lineinfile:
+    state: present
+    dest: /etc/default/grub
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX=(?!.* cgroup_enable)\"[^\"]+)(\".*)'
+    line: '\1 cgroup_enable=memory\2'
+
+- name: enable cgroup memory
+  become: true
+  when: judgehost == "enabled"
+  lineinfile:
+    state: present
+    dest: /etc/default/grub
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX=(?!.* swapaccount)\"[^\"]+)(\".*)'
+    line: '\1 swapaccount=1\2'
+
 - name: start and enable cgroup service
   become: true
   when: judgehost == "enabled"
