@@ -1,0 +1,60 @@
+---
+- name: get mysql databases
+  become: true
+  community.mysql.mysql_info:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    filter: databases
+  register: mysql_info
+
+- name: make
+  become: true
+  become_user: domjudge
+  command: make domserver
+  args:
+    chdir: /home/domjudge/src/domjudge-{{ version }}
+
+- name: install
+  become: true
+  command: make install-domserver
+  args:
+    chdir: /home/domjudge/src/domjudge-{{ version }}
+
+- name: generate database password
+  become: true
+  command: bin/dj_setup_database genpass
+  when: "'domjudge' not in mysql_info.databases"
+  args:
+    chdir: /home/domjudge/domjudge/domserver
+
+- name: setup database
+  become: true
+  command: bin/dj_setup_database -u root -p {{ mysql_root_password }} install
+  when: "'domjudge' not in mysql_info.databases"
+  args:
+    chdir: /home/domjudge/domjudge/domserver
+
+- name: nginx configuration
+  become: true
+  template:
+    src: templates/domjudge.conf
+    dest: /etc/nginx/sites-available/domjudge
+    mode: 0644
+
+- name: enable nginx domjudge
+  become: true
+  file:
+    src: /etc/nginx/sites-available/domjudge
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  notify:
+    - reload nginx
+
+- name: phpfpm configuration softlink
+  become: true
+  file:
+    src: /home/domjudge/domjudge/domserver/etc/domjudge-fpm.conf
+    dest: /etc/php/{{ php_version }}/fpm/pool.d/domjudge.conf
+    state: link
+  notify:
+    - reload php-fpm

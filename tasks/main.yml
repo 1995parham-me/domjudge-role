@@ -48,14 +48,6 @@
     check_implicit_admin: true
     state: present
 
-- name: get mysql databases
-  become: true
-  community.mysql.mysql_info:
-    login_user: root
-    login_password: "{{ mysql_root_password }}"
-    filter: databases
-  register: mysql_info
-
 - name: create domjudge user
   become: true
   ansible.builtin.user:
@@ -88,145 +80,10 @@
     chdir: /home/domjudge/src/domjudge-{{ version }}
     creates: paths.mk
 
-- name: make
-  become: true
-  become_user: domjudge
-  command: make domserver
+- name: setup domserver
   when: domserver == "enabled"
-  args:
-    chdir: /home/domjudge/src/domjudge-{{ version }}
+  import_tasks: domserver.yml
 
-- name: install
-  become: true
-  command: make install-domserver
-  when: domserver == "enabled"
-  args:
-    chdir: /home/domjudge/src/domjudge-{{ version }}
-
-- name: generate database password
-  become: true
-  command: bin/dj_setup_database genpass
-  when: domserver == "enabled" and "domjudge" not in mysql_info.databases
-  args:
-    chdir: /home/domjudge/domjudge/domserver
-
-- name: setup database
-  become: true
-  command: bin/dj_setup_database -u root -p {{ mysql_root_password }} install
-  when: domserver == "enabled" and "domjudge" not in mysql_info.databases
-  args:
-    chdir: /home/domjudge/domjudge/domserver
-
-- name: nginx configuration
-  become: true
-  when: domserver == "enabled"
-  template:
-    src: templates/domjudge.conf
-    dest: /etc/nginx/sites-available/domjudge
-    mode: 0644
-
-- name: enable nginx domjudge
-  become: true
-  when: domserver == "enabled"
-  file:
-    src: /etc/nginx/sites-available/domjudge
-    dest: /etc/nginx/sites-enabled/default
-    state: link
-  notify:
-    - reload nginx
-
-- name: phpfpm configuration softlink
-  become: true
-  when: domserver == "enabled"
-  file:
-    src: /home/domjudge/domjudge/domserver/etc/domjudge-fpm.conf
-    dest: /etc/php/{{ php_version }}/fpm/pool.d/domjudge.conf
-    state: link
-  notify:
-    - reload php-fpm
-
-- name: make
-  become: true
-  become_user: domjudge
-  command: make judgehost
+- name: setup judgehost
   when: judgehost == "enabled"
-  args:
-    chdir: /home/domjudge/src/domjudge-{{ version }}
-
-- name: install
-  become: true
-  command: make install-judgehost
-  when: judgehost == "enabled"
-  args:
-    chdir: /home/domjudge/src/domjudge-{{ version }}
-
-- name: create judgehost user
-  become: true
-  loop: "{{ range(0, judgehosts) | list }}"
-  when: judgehost == "enabled"
-  ansible.builtin.user:
-    name: domjudge-run-{{ item }}
-    create_home: false
-    shell: /bin/false
-    state: present
-
-- name: domjudge judgehost service
-  become: true
-  when: judgehost == "enabled"
-  template:
-    src: templates/domjudge-judgehost@.service
-    dest: /etc/systemd/system/domjudge-judgehost@.service
-    mode: 0644
-
-- name: domjudge cgroup service
-  become: true
-  when: judgehost == "enabled"
-  template:
-    src: templates/create-cgroups.service
-    dest: /etc/systemd/system/create-cgroups.service
-    mode: 0644
-
-- name: enable cgroup memory
-  become: true
-  when: judgehost == "enabled"
-  lineinfile:
-    state: present
-    dest: /etc/default/grub
-    backrefs: true
-    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* cgroup_enable)\"[^\"]+)(\".*)'
-    line: '\1 cgroup_enable=memory\2'
-
-- name: enable cgroup memory
-  become: true
-  when: judgehost == "enabled"
-  lineinfile:
-    state: present
-    dest: /etc/default/grub
-    backrefs: true
-    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* swapaccount)\"[^\"]+)(\".*)'
-    line: '\1 swapaccount=1\2'
-
-- name: start and enable cgroup service
-  become: true
-  when: judgehost == "enabled"
-  service:
-    name: create-cgroups
-    state: started
-    enabled: true
-
-- name: start and enable judgehost service
-  become: true
-  when: judgehost == "enabled"
-  loop: "{{ range(0, judgehosts) | list }}"
-  service:
-    name: domjudge-judgehost@{{ item }}
-    state: started
-    enabled: true
-
-- name: judgehost restapi secret configuration
-  become: true
-  when: judgehost == "enabled"
-  template:
-    src: templates/restapi.secret
-    dest: /home/domjudge/domjudge/judgehost/etc/restapi.secret
-    mode: 0600
+  import_tasks: judgehost.yml

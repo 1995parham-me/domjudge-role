@@ -1,0 +1,85 @@
+---
+- name: make
+  become: true
+  become_user: domjudge
+  command: make judgehost
+  args:
+    chdir: /home/domjudge/src/domjudge-{{ version }}
+
+- name: install
+  become: true
+  command: make install-judgehost
+  when: judgehost == "enabled"
+  args:
+    chdir: /home/domjudge/src/domjudge-{{ version }}
+
+- name: create judgehost user
+  become: true
+  loop: "{{ range(0, judgehosts) | list }}"
+  when: judgehost == "enabled"
+  ansible.builtin.user:
+    name: domjudge-run-{{ item }}
+    create_home: false
+    shell: /bin/false
+    state: present
+
+- name: domjudge judgehost service
+  become: true
+  when: judgehost == "enabled"
+  template:
+    src: templates/domjudge-judgehost@.service
+    dest: /etc/systemd/system/domjudge-judgehost@.service
+    mode: 0644
+
+- name: domjudge cgroup service
+  become: true
+  when: judgehost == "enabled"
+  template:
+    src: templates/create-cgroups.service
+    dest: /etc/systemd/system/create-cgroups.service
+    mode: 0644
+
+- name: enable cgroup memory
+  become: true
+  when: judgehost == "enabled"
+  lineinfile:
+    state: present
+    dest: /etc/default/grub
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* cgroup_enable)\"[^\"]+)(\".*)'
+    line: '\1 cgroup_enable=memory\2'
+
+- name: enable cgroup memory
+  become: true
+  when: judgehost == "enabled"
+  lineinfile:
+    state: present
+    dest: /etc/default/grub
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* swapaccount)\"[^\"]+)(\".*)'
+    line: '\1 swapaccount=1\2'
+
+- name: start and enable cgroup service
+  become: true
+  when: judgehost == "enabled"
+  service:
+    name: create-cgroups
+    state: started
+    enabled: true
+
+- name: start and enable judgehost service
+  become: true
+  when: judgehost == "enabled"
+  loop: "{{ range(0, judgehosts) | list }}"
+  service:
+    name: domjudge-judgehost@{{ item }}
+    state: started
+    enabled: true
+
+- name: judgehost restapi secret configuration
+  become: true
+  when: judgehost == "enabled"
+  template:
+    src: templates/restapi.secret
+    dest: /home/domjudge/domjudge/judgehost/etc/restapi.secret
+    mode: 0600
