@@ -163,8 +163,25 @@
 - name: create judgehost user
   become: true
   loop: "{{ range(0, judgehosts) | list }}"
+  when: judgehost == "enabled"
   ansible.builtin.user:
     name: domjudge-run-{{ item }}
     create_home: false
     shell: /bin/false
     state: present
+
+- name: domjudge judgehost service
+  become: true
+  when: judgehost == "enabled"
+  template:
+    src: templates/domjudge-judgehost@.service
+    dest: /etc/systemd/system/domjudge-judgehost@.service
+    mode: 0644
+
+- name: domjudge cgroup service
+  become: true
+  when: judgehost == "enabled"
+  template:
+    src: templates/create-cgroups.service
+    dest: /etc/systemd/system/create-cgroups.service
+    mode: 0644
