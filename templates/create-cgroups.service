@@ -3,7 +3,7 @@ Description=Make sure cgroups exist for DOMjudge judgedaemon
 
 [Service]
 Type=oneshot
-ExecStart=/home/parham/domjudge/judgehost/bin/create_cgroups
+ExecStart=/home/domjudge/domjudge/judgehost/bin/create_cgroups
 RemainAfterExit=true
 
 [Install]
