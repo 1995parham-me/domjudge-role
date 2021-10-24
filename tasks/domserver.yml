@@ -25,7 +25,7 @@
   become_user: domjudge
   register: judgehost_api_secret
   community.general.read_csv:
-    delimiter: '\t'
+    dialect: excel-tab
     path: /home/domjudge/domjudge/domserver/etc/restapi.secret
     fieldnames: id,url,user,pass
 
