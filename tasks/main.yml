@@ -36,12 +36,12 @@
     enabled: true
 
 - name: setting up root credentials
-  ignore_errors: true
   become: true
   mysql_user:
     name: root
     password: "{{ mysql_root_password }}"
     login_user: root
+    login_password: "{{ mysql_root_password }}"
     login_host: "localhost"
     host: localhost
     priv: '*.*:ALL,GRANT'
