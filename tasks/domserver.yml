@@ -10,17 +10,15 @@
 - name: make
   become: true
   become_user: domjudge
-  command: make domserver
-  args:
+  community.general.make:
+    target: domserver
     chdir: /home/domjudge/src/domjudge-{{ version }}
-    creates: /home/domjudge/domjudge/judgehost/etc
 
 - name: install
   become: true
-  command: make install-domserver
-  args:
+  community.general.make:
+    target: install-domserver
     chdir: /home/domjudge/src/domjudge-{{ version }}
-    creates: /home/domjudge/domjudge/judgehost/lib
 
 - name: generate database password
   become: true

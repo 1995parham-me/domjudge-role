@@ -2,17 +2,15 @@
 - name: make
   become: true
   become_user: domjudge
-  command: make judgehost
-  args:
+  community.general.make:
+    target: judgehost
     chdir: /home/domjudge/src/domjudge-{{ version }}
-    creates: /home/domjudge/domjudge/judgehost/etc
 
 - name: install
   become: true
-  command: make install-judgehost
-  args:
+  community.general.make:
+    target: install-judgehost
     chdir: /home/domjudge/src/domjudge-{{ version }}
-    creates: /home/domjudge/domjudge/judgehost/lib
 
 - name: create judgehost user
   become: true
