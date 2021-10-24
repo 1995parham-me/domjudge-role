@@ -28,7 +28,7 @@
 
 - name: print judgehost api secret
   ansible.builtin.debug:
-    msg: "rest api password is {{ judgehost_api_secret.content }}"
+    msg: "rest api password is {{ judgehost_api_secret.content | b64decode }}"
 
 - name: read admin initial password
   become: true
@@ -38,7 +38,7 @@
 
 - name: print judgehost api secret
   ansible.builtin.debug:
-    msg: "rest api password is {{ admin_initial_password.content }}"
+    msg: "rest api password is {{ admin_initial_password.content | b64decode }}"
 
 - name: generate database password
   become: true
