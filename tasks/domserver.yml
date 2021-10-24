@@ -22,7 +22,6 @@
 
 - name: read judgehost api secret
   become: true
-  become_user: domjudge
   register: judgehost_api_secret
   ansible.builtin.slurp:
     path: /home/domjudge/domjudge/domserver/etc/restapi.secret
@@ -33,10 +32,9 @@
 
 - name: read admin initial password
   become: true
-  become_user: domjudge
   register: admin_initial_password
   ansible.builtin.slurp:
-    path: /home/domjudge/domjudge/domserver/etc/
+    path: /home/domjudge/domjudge/domserver/etc/initial_admin_password.secret
 
 - name: print judgehost api secret
   ansible.builtin.debug:
