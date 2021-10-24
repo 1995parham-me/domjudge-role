@@ -6,8 +6,8 @@ domserver: enabled
 judgehost: disabled
 judgehosts: 2
 
-judgehost_domservers:
-  - id: default
-    url: http://localhost/domjudge/api
-    user: judgehost
-    pass: NP3FziLos2cHN0LN
+judgehost_domservers: []
+#  - id: default
+#    url: http://localhost/domjudge/api
+#    user: judgehost
+#    pass: NP3FziLos2cHN0LN
