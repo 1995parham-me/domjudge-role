@@ -20,6 +20,11 @@
     target: install-domserver
     chdir: /home/domjudge/src/domjudge-{{ version }}
 
+- name: print judgehost api password
+  become: true
+  become_user: domjudge
+  debug: rest api password is {{ lookup('csvfile', 'file=/home/domjudge/domjudge/domserver/etc/restapi.secret col=3') }}
+
 - name: generate database password
   become: true
   command: bin/dj_setup_database genpass
