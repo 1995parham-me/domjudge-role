@@ -30,7 +30,8 @@
     fieldnames: id,url,user,pass
 
 - name: print judgehost api password
-  debug: rest api password is {{ judgehost_api_secret.list.0.user }}:{{ judgehost_api_secret.list.0.pass }}
+  ansible.builtin.debug:
+    msg: "rest api password is {{ judgehost_api_secret.list.0.user }}:{{ judgehost_api_secret.list.0.pass }}"
 
 - name: generate database password
   become: true
