@@ -20,18 +20,27 @@
     target: install-domserver
     chdir: /home/domjudge/src/domjudge-{{ version }}
 
-- name: read judgehost api judgehost_api_secret
+- name: read judgehost api secret
   become: true
   become_user: domjudge
   register: judgehost_api_secret
-  community.general.read_csv:
-    dialect: excel-tab
+  ansible.builtin.slurp:
     path: /home/domjudge/domjudge/domserver/etc/restapi.secret
-    fieldnames: id,url,user,pass
 
-- name: print judgehost api password
+- name: print judgehost api secret
   ansible.builtin.debug:
-    msg: "rest api password is {{ judgehost_api_secret.list.0.user }}:{{ judgehost_api_secret.list.0.pass }}"
+    msg: "rest api password is {{ judgehost_api_secret.content }}"
+
+- name: read admin initial password
+  become: true
+  become_user: domjudge
+  register: admin_initial_password
+  ansible.builtin.slurp:
+    path: /home/domjudge/domjudge/domserver/etc/
+
+- name: print judgehost api secret
+  ansible.builtin.debug:
+    msg: "rest api password is {{ admin_initial_password.content }}"
 
 - name: generate database password
   become: true
