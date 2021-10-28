@@ -49,7 +49,6 @@
 - name: enable cgroup memory in grub
   become: true
   when: cgroup_enable_grub_check.found == 0
-  notify: update grub
   lineinfile:
     state: present
     dest: /etc/default/grub
@@ -71,13 +70,17 @@
 - name: enable swapaccount in grub
   become: true
   when: swapaccount_grub_check.found == 0
-  notify: update grub
   lineinfile:
     state: present
     dest: /etc/default/grub
     backrefs: true
     regexp: "^(GRUB_CMDLINE_LINUX_DEFAULT=\".*)\"$"
     line: '\1 swapaccount=1"'
+
+- name: update-grub
+  when: swapaccount_grub_check.found == 0 or cgroup_enable_grub_check == 0
+  become: true
+  command: update-grub
 
 - name: restart after update-grub
   when: swapaccount_grub_check.found == 0 or cgroup_enable_grub_check == 0

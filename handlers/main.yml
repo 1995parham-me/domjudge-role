@@ -10,7 +10,3 @@
   service:
     name: php{{ php_version }}-fpm
     state: reloaded
-
-- name: update grub
-  become: true
-  command: update-grub
