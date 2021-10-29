@@ -14,6 +14,14 @@
 
 - name: create judgehost user
   become: true
+  ansible.builtin.user:
+    name: domjudge-run
+    create_home: false
+    shell: /bin/false
+    state: present
+
+- name: create judgehost user
+  become: true
   loop: "{{ range(0, judgehosts) | list }}"
   ansible.builtin.user:
     name: domjudge-run-{{ item }}
