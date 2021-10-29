@@ -24,7 +24,7 @@
 - name: domjudge sudoers
   become: true
   copy:
-    remote_src: /home/domjudge/domjudge/judgehost/etc/sudoers-domjudge
+    src: /home/domjudge/domjudge/judgehost/etc/sudoers-domjudge
     dest: /etc/sudoers.d/sudoers-domjudge
     mode: 0644
 
