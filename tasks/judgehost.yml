@@ -21,6 +21,13 @@
     shell: /bin/false
     state: present
 
+- name: domjudge sudoers
+  become: true
+  copy:
+    src: /home/domjudge/domjudge/judgehost/etc/sudoers-domjudge
+    dest: /etc/sudoers.d/sudoers-domjudge
+    mode: 0644
+
 - name: domjudge judgehost service
   become: true
   template:
