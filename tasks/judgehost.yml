@@ -26,6 +26,7 @@
   copy:
     src: /home/domjudge/domjudge/judgehost/etc/sudoers-domjudge
     dest: /etc/sudoers.d/sudoers-domjudge
+    remote_src: true
     mode: 0644
 
 - name: domjudge judgehost service
