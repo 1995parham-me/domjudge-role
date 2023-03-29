@@ -1,10 +1,9 @@
 ---
 galaxy_info:
-  author: Parham ALvani
+  author: Parham Alvani
   description: install domjudge
-  company: Amirkabir University of Tech.
 
-  issue_tracker_url: https://github.com/aut-icpc/domjudge-role/issues
+  issue_tracker_url: https://github.com/1995parham-me/domjudge-role/issues
 
   license: GPL-3.0-or-later
 
